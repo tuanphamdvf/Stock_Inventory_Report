@@ -36,5 +36,5 @@
     'demo': [
         'demo/demo.xml',
     ],
-
+    'images': ['static/img/main_screenshot.gif']
 }
