@@ -4,6 +4,7 @@ from datetime import date
 from functools import reduce
 import random
 import datetime
+from odoo.http import request
 
 
 class BaoCaoXuatNhapKho(models.TransientModel):
@@ -28,18 +29,15 @@ class BaoCaoXuatNhapKho(models.TransientModel):
     #     return list_location
 
     def print_report(self):
-        print(self)
+
         product = "product"
+        user_id = request.session.uid
+        user = request.env['res.users'].browse(user_id)
         # danh sách sản phẩm và giá trị vốn
-        list_product = self.env['product.template'].search(
-            [('detailed_type', '=', product) and ('active', '=', True)])
+
         list_product_main = self.env['product.product'].search(
             [('active', '=', True) and ('detailed_type', '=', product)])
-        list_kho_hang_main = self.env['stock.location'].search(
-            [('active', '=', True)])
-        # giá trị vốn
-        # list_unit_cost = self.env['stock.valuation.layer'].search([])
-        # today = date.today().strftime("%d/%m/%Y")
+
         todayDate = datetime.date.today()
         if todayDate.day > 25:
             todayDate += datetime.timedelta(7)
@@ -58,9 +56,7 @@ class BaoCaoXuatNhapKho(models.TransientModel):
         listkhohang = []
 
         list_san_pham = []
-        danhsachphieu = []
-        danhsachphieuchilds = []
-        khohang = ''
+
         tongtondau = 0
         tongtoncuoi = 0
         tongthaydoi = 0
@@ -92,7 +88,6 @@ class BaoCaoXuatNhapKho(models.TransientModel):
 
                 if len(danhsachphieuxuat) != 0:
                     for j in danhsachphieuxuat:
-                        print(j['qty_done'])
                         if j['date'].date() < ngay_ton_start and j['product_id']['id'] == i.id:
                             tongxuatdauky += j['qty_done']
                         if j['date'].date() >= ngay_ton_start and j['product_id']['id'] == i.id and j[
@@ -138,53 +133,23 @@ class BaoCaoXuatNhapKho(models.TransientModel):
                     tongnhaptrongky = 0
 
                 list_san_pham.append(vals)
-
-        # if len(list_san_pham) != 0:
-        #     for i in list_san_pham:
-        #         print(i['name'])
+        if len(list_san_pham) != 0:
+            for i in list_san_pham:
+                totaltondau += i['tondau']
+                totalgiatridau += i['giatridau']
+                totaltoncuoi += i['toncuoi']
+                totalgiatricuoi += i['giatricuoi']
+                totalthaydoi += i['thaydoi']
+                totalgiatrithaydoi += i['giatrithaydoi']
 
         data['list_san_pham'] = list_san_pham
         data['ngay_ton_start'] = ngay_ton_start.strftime('%d/%m/%Y')
         data['ngay_ton_end'] = ngay_ton_end.strftime('%d/%m/%Y')
-        data['tongtondau'] = tongtondau
-        data['tongtoncuoi'] = tongtoncuoi
-        data['tongthaydoi'] = tongthaydoi
-        data['tonggiatridau'] = tonggiatridau
-        data['tonggiatricuoi'] = tonggiatricuoi
-        data['tonggiatrithaydoi'] = tonggiatrithaydoi
+        data['tongtondau'] = totaltondau
+        data['tongtoncuoi'] = totaltoncuoi
+        data['tongthaydoi'] = totalthaydoi
+        data['tonggiatridau'] = totalgiatridau
+        data['tonggiatricuoi'] = totalgiatricuoi
+        data['tonggiatrithaydoi'] = totalgiatrithaydoi
         data['khohang'] = diadiem['complete_name']
-        print(data)
-        return self.env.ref("casound.action_bao_cao_xuat_nhap_kho_report").report_action(self, data=data)
-
-        # list_id = []
-        # if len(list_product) != 0:
-        #     for item in list_product:
-        #         print(item)
-        # list_unique = list(set(list_id))
-
-        # result = []
-        # if len(list_product_main) != 0:
-        #     for i in list_product_main:
-        #         print(i)
-        #         print(i['id'])
-        #         quant = self.env['stock.quant'].search([('id', '=', i['id'])])
-
-        #         data = {
-        #             'name': i.name,
-        #             'giavon': i['standard_price'],
-        #             'tondau': quant[0]['quantity'],
-        #             'toncuoi': quant[-1]['quantity'],
-        #             'thaydoi': quant[0]['quantity'] - quant[-1]['quantity'],
-
-        #         }
-        #         result.append(data)
-        #         product = []
-
-        # if len(data_list) != 0:
-        #     for j in data_list:
-        #         print(type(i.id), type(j.product_id))
-        #         if j.product_id == int(i.id):
-        #             product.append(j)
-        #             unit_cost.append(j)
-        #             print("danh sách", unit_cost)
-        #             if len(product) != 0:
+        data['user_name'] = user.name
