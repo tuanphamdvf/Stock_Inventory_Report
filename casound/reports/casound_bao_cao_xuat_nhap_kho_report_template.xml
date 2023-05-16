@@ -98,7 +98,7 @@
                     <tbody>
                         <t t-if="list_san_pham">
                             <t t-foreach="list_san_pham" t-as="i">
-                                <tr style=" height: 20px;  background: #ccc;">
+                                <tr style=" height: 20px;">
                                     <td style="text-align:center;padding: 10px;font-weight: 600;">
                                         <t t-esc="i_index +1"></t>
                                     </td>
@@ -134,7 +134,7 @@
 
 
                             </t>
-                            <tr style=" height: 20px;  background: #ccc;">
+                            <tr style=" height: 20px;">
 
                                 <td colspan="3" style="text-align:center;padding: 10px;font-weight: 600;">
                                     TOTAL

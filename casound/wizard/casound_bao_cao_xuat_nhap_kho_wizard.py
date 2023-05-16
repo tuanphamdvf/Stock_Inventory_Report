@@ -133,6 +133,13 @@ class BaoCaoXuatNhapKho(models.TransientModel):
                     tongnhaptrongky = 0
 
                 list_san_pham.append(vals)
+                totaltondau = 0
+                totalgiatridau = 0
+                totaltoncuoi = 0
+                totalgiatricuoi = 0
+                totalthaydoi = 0
+                totalgiatrithaydoi = 0
+
         if len(list_san_pham) != 0:
             for i in list_san_pham:
                 totaltondau += i['tondau']
@@ -153,3 +160,4 @@ class BaoCaoXuatNhapKho(models.TransientModel):
         data['tonggiatrithaydoi'] = totalgiatrithaydoi
         data['khohang'] = diadiem['complete_name']
         data['user_name'] = user.name
+        return self.env.ref("casound.action_bao_cao_xuat_nhap_kho_report").report_action(self, data=data)
